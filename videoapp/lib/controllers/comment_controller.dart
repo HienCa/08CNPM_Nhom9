@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:videoapp/constants.dart';
 import 'package:videoapp/models/comment.dart';
@@ -55,6 +56,7 @@ class CommentController extends GetxController {
           profilePhoto: (userDoc.data()! as dynamic)['profilePhoto'],
           uid: authController.user.uid,
           id: 'Comment $len',
+          videoId: _postId,
         );
         await firestore
             .collection('videos')
@@ -69,6 +71,12 @@ class CommentController extends GetxController {
         await firestore.collection('videos').doc(_postId).update({
           'commentCount': (doc.data()! as dynamic)['commentCount'] + 1,
         });
+        Get.snackbar(
+          'BÌNH LUẬN!',
+          'Bạn đã vừa gửi bình luận vào video này.',
+          backgroundColor: Colors.lightBlue, // Màu nền
+          colorText: Colors.white, // M
+        );
       }
     } catch (e) {
       Get.snackbar(

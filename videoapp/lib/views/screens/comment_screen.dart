@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:marquee/marquee.dart';
+// import 'package:marquee/marquee.dart';
 import 'package:videoapp/constants.dart';
 import 'package:videoapp/controllers/comment_controller.dart';
 import 'package:timeago/timeago.dart' as tago;
@@ -21,6 +21,119 @@ class _CommentScreenState extends State<CommentScreen> {
   final TextEditingController _commentController = TextEditingController();
 
   CommentController commentController = Get.put(CommentController());
+  _dismissDialog() {
+    Navigator.pop(context);
+  }
+
+  Future<void> deleteComment(String videoId, String commentId) async {
+    try {
+      // Reference to the comment document
+      final commentRef = firestore
+          .collection('videos')
+          .doc(videoId)
+          .collection('comments')
+          .doc(commentId);
+
+      // Delete the comment
+      await commentRef.delete();
+      Get.snackbar(
+      'BÌNH LUẬN!',
+      'Bạn đã xóa bình luận thành công.',
+      backgroundColor: Colors.redAccent, // Màu nền
+      colorText: Colors.white, // M
+    );
+      // print('Comment deleted successfully.');
+    } catch (error) {
+      // print('Error deleting comment: $error');
+    }
+  }
+
+  void showSimpleDialog(String uid, String videoId, String commentId) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return SimpleDialog(
+            backgroundColor: Colors.white,
+            // title: const Text(''),
+            children: <Widget>[
+              SimpleDialogOption(
+                onPressed: () {
+                  _dismissDialog();
+                },
+                child: InkWell(
+                    onTap: () => {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => ProfileScreen(uid: uid),
+                            ),
+                          ),
+                        },
+                    child: const Center(
+                        child: Text(
+                      'Xem trang cá nhân',
+                      style: TextStyle(fontSize: 20, color: textColor),
+                    ))),
+              ),
+              uid == authController.user.uid
+                  ? const Divider(
+                      color: textColor,
+                    )
+                  : Container(),
+              uid == authController.user.uid
+                  ? SimpleDialogOption(
+                      onPressed: () {
+                        _dismissDialog();
+                      },
+                      child: InkWell(
+                          onTap: () => {
+                                _dismissDialog(),
+                                deleteComment(videoId, commentId)
+                              },
+                          child: const Center(
+                              child: Text(
+                            'Xóa bình luận',
+                            style: TextStyle(fontSize: 20, color: textColor),
+                          ))),
+                    )
+                  : const SimpleDialogOption(),
+              uid != authController.user.uid
+                  ? const Divider(
+                      color: textColor,
+                    )
+                  : Container(),
+              uid != authController.user.uid
+                  ? SimpleDialogOption(
+                      onPressed: () {
+                        _dismissDialog();
+                      },
+                      child: InkWell(
+                          onTap: () => {},
+                          child: const Center(
+                              child: Text(
+                            'Kết bạn',
+                            style: TextStyle(fontSize: 20, color: textColor),
+                          ))),
+                    )
+                  : const SimpleDialogOption(),
+              const Divider(
+                color: textColor,
+              ),
+              SimpleDialogOption(
+                onPressed: () {
+                  _dismissDialog();
+                },
+                child: InkWell(
+                    onTap: () => {},
+                    child: const Center(
+                        child: Text(
+                      'Chặn',
+                      style: TextStyle(fontSize: 20, color: textColor),
+                    ))),
+              ),
+            ],
+          );
+        });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +155,11 @@ class _CommentScreenState extends State<CommentScreen> {
                         final comment = commentController.comments[index];
                         return ListTile(
                           leading: InkWell(
-                            onTap: () => ProfileScreen(uid: comment.uid),
+                            onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        ProfileScreen(uid: comment.uid))),
                             child: CircleAvatar(
                               backgroundColor: Colors.black,
                               backgroundImage:
@@ -51,26 +168,48 @@ class _CommentScreenState extends State<CommentScreen> {
                           ),
                           title: Row(
                             children: [
-                              // Text(
-                              //   "${comment.username}  ",
+                              InkWell(
+                                onTap: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            ProfileScreen(uid: comment.uid))),
+                                child: Text(
+                                  "${comment.username}  ",
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    color: Colors.red,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                              // Marquee(
+                              //   text: "${comment.username}  ",
                               //   style: const TextStyle(
                               //     fontSize: 20,
                               //     color: Colors.red,
                               //     fontWeight: FontWeight.w700,
                               //   ),
+                              //   scrollAxis: Axis.horizontal,
+                              //   crossAxisAlignment: CrossAxisAlignment.start,
+                              //   blankSpace: 20.0,
+                              //   velocity: 100.0,
                               // ),
-                              Marquee(
-                                text: "${comment.username}  ",
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  color: Colors.red,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                                scrollAxis: Axis.horizontal,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                blankSpace: 20.0,
-                                velocity: 100.0,
-                              ),
+                              // Marquee(
+                              //   text: 'Some sample text that takes some space.',
+                              //   style: const TextStyle(fontWeight: FontWeight.bold),
+                              //   scrollAxis: Axis.horizontal,
+                              //   crossAxisAlignment: CrossAxisAlignment.start,
+                              //   blankSpace: 20.0,
+                              //   velocity: 100.0,
+                              //   pauseAfterRound: const Duration(seconds: 1),
+                              //   startPadding: 10.0,
+                              //   accelerationDuration: const Duration(seconds: 1),
+                              //   accelerationCurve: Curves.linear,
+                              //   decelerationDuration:
+                              //       const Duration(milliseconds: 500),
+                              //   decelerationCurve: Curves.easeOut,
+                              // ),
                               Row(
                                 children: [
                                   Text(
@@ -96,15 +235,20 @@ class _CommentScreenState extends State<CommentScreen> {
                               )
                             ],
                           ),
-                          subtitle: RichText(
-                            text: TextSpan(
-                              text: comment.comment,
-                              style: const TextStyle(
-                                  color: Colors.black), // Đặt kiểu cho văn bản
+                          subtitle: InkWell(
+                            onLongPress: () => showSimpleDialog(
+                                comment.uid, comment.videoId, comment.id),
+                            child: RichText(
+                              text: TextSpan(
+                                text: comment.comment,
+                                style: const TextStyle(
+                                    color:
+                                        Colors.black), // Đặt kiểu cho văn bản
+                              ),
+                              maxLines: 5, // Giới hạn số dòng hiển thị
+                              overflow: TextOverflow
+                                  .ellipsis, // Hiển thị dấu ba chấm khi văn bản quá dài
                             ),
-                            maxLines: 5, // Giới hạn số dòng hiển thị
-                            overflow: TextOverflow
-                                .ellipsis, // Hiển thị dấu ba chấm khi văn bản quá dài
                           ),
                           trailing: InkWell(
                             onTap: () =>
@@ -159,7 +303,9 @@ class _CommentScreenState extends State<CommentScreen> {
                   ),
                   trailing: TextButton(
                     onPressed: () =>
-                        commentController.postComment(_commentController.text),
+                        {commentController.postComment(_commentController.text),
+                        _commentController.clear()
+                        },
                     child: const Text(
                       'Gửi',
                       style: TextStyle(

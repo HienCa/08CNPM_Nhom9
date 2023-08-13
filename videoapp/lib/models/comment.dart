@@ -3,11 +3,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Comment {
   String username;
   String comment;
+  // ignore: prefer_typing_uninitialized_variables
   final datePublished;
   List likes;
   String profilePhoto;
   String uid;
   String id;
+  String videoId;
 
   Comment({
     required this.username,
@@ -17,6 +19,7 @@ class Comment {
     required this.profilePhoto,
     required this.uid,
     required this.id,
+    required this.videoId,
   });
 
   Map<String, dynamic> toJson() => {
@@ -27,6 +30,7 @@ class Comment {
         'profilePhoto': profilePhoto,
         'uid': uid,
         'id': id,
+        'videoId': videoId,
       };
 
   static Comment fromSnap(DocumentSnapshot snap) {
@@ -39,6 +43,7 @@ class Comment {
       profilePhoto: snapshot['profilePhoto'],
       uid: snapshot['uid'],
       id: snapshot['id'],
+      videoId: snapshot['videoId'],
     );
   }
 }

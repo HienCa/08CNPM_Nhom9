@@ -58,14 +58,14 @@ class _HomeScreenState extends State<HomeScreen> {
             // icon: CustomIcon(),
             icon: IconButton(
               onPressed: () => pickVideo(
-                  ImageSource.gallery, context), // Wrap the function call here
+                  ImageSource.gallery, context), 
               icon: const CustomIcon(),
             ),
             label: '',
           ),
           const BottomNavigationBarItem(
-            icon: Icon(Icons.message, size: 30),
-            label: 'Hộp thư',
+            icon: Icon(Icons.people, size: 30),
+            label: 'Bạn bè',
           ),
           const BottomNavigationBarItem(
             icon: Icon(Icons.person, size: 30),

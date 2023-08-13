@@ -2,12 +2,17 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get/get.dart';
+import 'package:videoapp/views/screens/chat/chat_page.dart';
+import 'package:videoapp/views/screens/profile_screen.dart';
 
 import '../../constants.dart';
 import '../../models/user.dart';
 
+// ignore: use_key_in_widget_constructors
 class FriendScreen extends StatefulWidget {
   @override
+  // ignore: library_private_types_in_public_api
   _FriendScreenState createState() => _FriendScreenState();
 }
 
@@ -81,8 +86,14 @@ class _FriendScreenState extends State<FriendScreen> {
         fetchReceivedFriendRequests();
         fetchFriends();
       }); // Gọi setState để rebuild giao diện với danh sách rỗng
+      Get.snackbar(
+        'KẾT BẠN!',
+        'Chúc mừng, hai bạn giờ đã là bạn bè.',
+        backgroundColor: Colors.lightBlue, // Màu nền
+        colorText: Colors.white, // M
+      );
     } catch (e) {
-      print('Error accepting friend request: $e');
+      // print('Error accepting friend request: $e');
     }
   }
 
@@ -102,7 +113,7 @@ class _FriendScreenState extends State<FriendScreen> {
         fetchFriends();
       }); // Gọi setState để rebuild giao diện với danh sách rỗng
     } catch (e) {
-      print('Error accepting friend request: $e');
+      // print('Error accepting friend request: $e');
     }
   }
 
@@ -136,8 +147,14 @@ class _FriendScreenState extends State<FriendScreen> {
         fetchFriends();
         fetchReceivedFriendRequests();
       });
+      Get.snackbar(
+        'KẾT BẠN!',
+        'Bạn đã hủy kết bạn thành công.',
+        backgroundColor: Colors.lightBlue, // Màu nền
+        colorText: Colors.white, // M
+      );
     } catch (e) {
-      print('Error accepting friend request: $e');
+      // print('Error accepting friend request: $e');
     }
   }
 
@@ -183,7 +200,7 @@ class _FriendScreenState extends State<FriendScreen> {
         setState(() {}); // Gọi setState để rebuild giao diện với danh sách rỗng
       }
     } catch (e) {
-      print('Error fetching received friend requests: $e');
+      // print('Error fetching received friend requests: $e');
     }
   }
 
@@ -228,7 +245,7 @@ class _FriendScreenState extends State<FriendScreen> {
         setState(() {}); // Gọi setState để rebuild giao diện với danh sách rỗng
       }
     } catch (e) {
-      print('Error fetching received friend requests: $e');
+      // print('Error fetching received friend requests: $e');
     }
   }
 
@@ -239,22 +256,30 @@ class _FriendScreenState extends State<FriendScreen> {
         length: 2, // Số lượng tab
         child: Scaffold(
           appBar: AppBar(
-            title: const Text('Danh sách kết bạn'),
+            backgroundColor: Colors.redAccent,
+            title: const Center(child: Text('DANH SÁCH KẾT BẠN',style: TextStyle(fontWeight: FontWeight.bold)), ),
             bottom: const TabBar(
+              indicatorColor: Colors.white,
+              
               tabs: [
                 Tab(text: 'Bạn bè'),
                 Tab(text: 'Lời mời kết bạn'),
+                // Tab(text: 'Đang theo dõi'),
+                // Tab(text: 'Người theo dõi'),
               ],
             ),
           ),
           body: Padding(
             padding: const EdgeInsets.all(1.0),
             child: TabBarView(
+              
               children: [
                 // Nội dung cho tab 'Đã kết bạn'
                 buildFriendList(),
                 // Nội dung cho tab 'Lời mời'
                 buildFriendRequestList(),
+                // Text(''),
+                // Text(''),
               ],
             ),
           ),
@@ -272,15 +297,35 @@ class _FriendScreenState extends State<FriendScreen> {
         return Padding(
           padding: const EdgeInsets.only(top: 20),
           child: ListTile(
-            leading: CircleAvatar(
-              backgroundImage: NetworkImage(
-                usersInfo[index].profilePhoto,
+            leading: InkWell(
+              onTap: () => {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => ProfileScreen(uid: usersInfo[index].uid),
+                  ),
+                )
+              },
+              child: CircleAvatar(
+                backgroundImage: NetworkImage(
+                  usersInfo[index].profilePhoto,
+                ),
               ),
             ),
-            title: Text(
-              usersInfo[index].name,
-              style: const TextStyle(
-                  fontSize: 18, color: textColor, fontWeight: FontWeight.bold),
+            title: InkWell(
+              onTap: () => {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => ChatPage(receiverUserName: usersInfo[index].name, receierUserId: usersInfo[index].uid),
+                  ),
+                )
+              },
+              child: Text(
+                usersInfo[index].name,
+                style: const TextStyle(
+                    fontSize: 18,
+                    color: textColor,
+                    fontWeight: FontWeight.bold),
+              ),
             ),
             // ignore: sized_box_for_whitespace
             trailing: Container(
@@ -338,15 +383,33 @@ class _FriendScreenState extends State<FriendScreen> {
         return Padding(
           padding: const EdgeInsets.only(top: 20),
           child: ListTile(
-            leading: CircleAvatar(
-              backgroundImage: NetworkImage(
-                friendsList[index].profilePhoto,
+            leading: InkWell(
+              onTap: () => {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => ProfileScreen(uid: friendsList[index].uid),
+                  ),
+                )
+              },
+              child: CircleAvatar(
+                backgroundImage: NetworkImage(
+                  friendsList[index].profilePhoto,
+                ),
               ),
             ),
-            title: Text(
-              friendsList[index].name,
-              style: const TextStyle(
-                  fontSize: 18, color: textColor, fontWeight: FontWeight.bold),
+            title: InkWell(
+              onTap: () => {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => ChatPage(receiverUserName: friendsList[index].name, receierUserId: friendsList[index].uid),
+                  ),
+                )
+              },
+              child: Text(
+                friendsList[index].name,
+                style: const TextStyle(
+                    fontSize: 18, color: textColor, fontWeight: FontWeight.bold),
+              ),
             ),
             // ignore: sized_box_for_whitespace
             trailing: Container(
@@ -358,8 +421,8 @@ class _FriendScreenState extends State<FriendScreen> {
               child: TextButton(
                 onPressed: () {
                   // cancelFriend(friendsList[index].uid);
-                  showCupertinoDialog(friendsList[index].name, friendsList[index].uid);
-                  
+                  showCupertinoDialog(
+                      friendsList[index].name, friendsList[index].uid);
                 },
                 child: const Text(
                   'Hủy kết bạn',
